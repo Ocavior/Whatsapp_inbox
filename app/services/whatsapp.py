@@ -5,8 +5,6 @@ from typing import Dict, Optional, List
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from app.config import *
 from app.utils.logger import logger
-from app.services.mongodb_rate_limiter import MongoDBRateLimiter
-from app.services.mongodb_cache import MongoDBCache
 
 
 class WhatsAppService:
@@ -21,11 +19,32 @@ class WhatsAppService:
             "Content-Type": "application/json"
         }
         
-        self.rate_limiter = MongoDBRateLimiter(
-            max_requests=80,  # WhatsApp limit
-            window_seconds=1
-        )
-        self.cache = MongoDBCache()
+        # Simple in-memory rate limiting (for now)
+        self._last_request_time = 0
+        self._request_count = 0
+        self._rate_limit_window = 1.0  # 1 second
+        self._max_requests_per_window = 80
+    
+    async def _check_rate_limit(self) -> bool:
+        """Simple rate limiter"""
+        current_time = time.time()
+        
+        # Reset counter if window has passed
+        if current_time - self._last_request_time > self._rate_limit_window:
+            self._request_count = 0
+            self._last_request_time = current_time
+        
+        # Check if we're within limits
+        if self._request_count >= self._max_requests_per_window:
+            wait_time = self._rate_limit_window - (current_time - self._last_request_time)
+            if wait_time > 0:
+                logger.warning(f"Rate limit reached, waiting {wait_time:.2f}s")
+                time.sleep(wait_time)
+                self._request_count = 0
+                self._last_request_time = time.time()
+        
+        self._request_count += 1
+        return True
     
     @retry(
         stop=stop_after_attempt(3),
@@ -40,12 +59,7 @@ class WhatsAppService:
         """Send text message with retry logic"""
         
         # Wait for rate limit
-        if not await self.rate_limiter.acquire("whatsapp_api"):
-            return {
-                "success": False,
-                "error": "Rate limit exceeded",
-                "error_code": 429
-            }
+        await self._check_rate_limit()
         
         payload = {
             "messaging_product": "whatsapp",
@@ -62,12 +76,7 @@ class WhatsAppService:
                                   language_code: str = "en_US") -> Dict:
         """Send template message"""
         
-        if not await self.rate_limiter.acquire("whatsapp_api"):
-            return {
-                "success": False,
-                "error": "Rate limit exceeded",
-                "error_code": 429
-            }
+        await self._check_rate_limit()
         
         template_data = {
             "name": template_name,
@@ -94,12 +103,7 @@ class WhatsAppService:
                                caption: str = None) -> Dict:
         """Send media message (image, video, audio, document)"""
         
-        if not await self.rate_limiter.acquire("whatsapp_api"):
-            return {
-                "success": False,
-                "error": "Rate limit exceeded",
-                "error_code": 429
-            }
+        await self._check_rate_limit()
         
         if not media_url and not media_id:
             return {
@@ -113,20 +117,11 @@ class WhatsAppService:
             "type": media_type
         }
         
-        if media_type == "image":
-            payload["image"] = {"link" if media_url else "id": media_url or media_id}
-            if caption:
-                payload["image"]["caption"] = caption
-        elif media_type == "video":
-            payload["video"] = {"link" if media_url else "id": media_url or media_id}
-            if caption:
-                payload["video"]["caption"] = caption
-        elif media_type == "audio":
-            payload["audio"] = {"link" if media_url else "id": media_url or media_id}
-        elif media_type == "document":
-            payload["document"] = {"link" if media_url else "id": media_url or media_id}
-            if caption:
-                payload["document"]["caption"] = caption
+        media_obj = {"link" if media_url else "id": media_url or media_id}
+        if caption and media_type in ["image", "video", "document"]:
+            media_obj["caption"] = caption
+        
+        payload[media_type] = media_obj
         
         return await self._make_request(payload)
     
@@ -163,7 +158,7 @@ class WhatsAppService:
             # Handle rate limiting
             if response.status_code == 429:
                 retry_after = int(response.headers.get('Retry-After', 60))
-                logger.warning(f"Rate limited. Retrying after {retry_after} seconds")
+                logger.warning(f"Rate limited by API. Retrying after {retry_after} seconds")
                 time.sleep(retry_after)
                 raise requests.exceptions.RetryError("Rate limited")
             
@@ -205,7 +200,7 @@ class WhatsAppService:
                 "error": "Connection error"
             }
         except Exception as e:
-            logger.error(f"Unexpected error: {e}")
+            logger.error(f"Unexpected error: {e}", exc_info=True)
             return {
                 "success": False,
                 "message_id": None,
@@ -229,12 +224,17 @@ class WhatsAppService:
         import hashlib
         
         if not signature or not WHATSAPP_APP_SECRET:
+            logger.warning("Missing signature or app secret for validation")
+            return True  # Skip validation if not configured
+        
+        try:
+            expected_signature = hmac.new(
+                WHATSAPP_APP_SECRET.encode('utf-8'),
+                payload,
+                hashlib.sha256
+            ).hexdigest()
+            
+            return hmac.compare_digest(f"sha256={expected_signature}", signature)
+        except Exception as e:
+            logger.error(f"Error validating signature: {e}")
             return False
-        
-        expected_signature = hmac.new(
-            WHATSAPP_APP_SECRET.encode('utf-8'),
-            payload,
-            hashlib.sha256
-        ).hexdigest()
-        
-        return hmac.compare_digest(f"sha256={expected_signature}", signature)

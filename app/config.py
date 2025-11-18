@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # WhatsApp Configuration
-WHATSAPP_ACCESS_TOKEN="EAAYZAvCGgdngBPyDWm2fasIfcF9noeyMXeiUg1iyhhPngzZAAzMJPM0g5hMUTaCrfZAUhtLXJCNeJcjsy1QRL6jZAUJHTgo6ZCVBl9snzk96iQE83uBzWI1pcZAXzq5Y2fpZAGMPixivxfadbCMonSS5SxAI6r6bkP5WriIcDhmSYZCLDcAusEtgTImOTlgGwmvfwuBZBXGZCym35YfcQTEFO8NZBWkNWRooZB2ZAZBTZAFIkFMX5NAkTN1cCoapmLAsOm1S45DKOM6RiilNWRSovufkGJZCUDgVdfxS09K0ISGwnAZDZD"
-WHATSAPP_PHONE_NUMBER_ID="913308758523248"
+WHATSAPP_ACCESS_TOKEN = os.getenv("WHATSAPP_ACCESS_TOKEN")
+WHATSAPP_PHONE_NUMBER_ID = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
 WHATSAPP_BUSINESS_ACCOUNT_ID = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID")
 WHATSAPP_APP_SECRET = os.getenv("WHATSAPP_APP_SECRET")
 WEBHOOK_VERIFY_TOKEN = os.getenv("WEBHOOK_VERIFY_TOKEN", "verify_token")
@@ -34,8 +34,30 @@ ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",
 MAX_UPLOAD_SIZE = int(os.getenv("MAX_UPLOAD_SIZE", "52428800"))  # 50MB
 
 # Validation - Check required variables
-required_vars = ["WHATSAPP_ACCESS_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"]
-missing_vars = [var for var in required_vars if not globals().get(var)]
+required_vars = {
+    "WHATSAPP_ACCESS_TOKEN": WHATSAPP_ACCESS_TOKEN,
+    "WHATSAPP_PHONE_NUMBER_ID": WHATSAPP_PHONE_NUMBER_ID,
+    "MONGODB_URI": MONGODB_URI
+}
+
+missing_vars = [var for var, value in required_vars.items() if not value]
 
 if missing_vars:
-    raise Exception(f"Missing required environment variables: {', '.join(missing_vars)}")
+    error_msg = f"""
+    ❌ Missing required environment variables: {', '.join(missing_vars)}
+    
+    Please create a .env file with the following variables:
+    {chr(10).join(f'  - {var}' for var in missing_vars)}
+    
+    See .env.example for reference.
+    """
+    raise ValueError(error_msg)
+
+# Security warnings
+if DEBUG:
+    print("⚠️  DEBUG mode is ON - DO NOT use in production!")
+
+if SECRET_KEY == "your-secret-key-change-in-production":
+    print("⚠️  Using default SECRET_KEY - CHANGE IT in production!")
+
+print("✅ Configuration loaded successfully")
