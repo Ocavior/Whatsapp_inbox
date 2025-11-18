@@ -1,0 +1,33 @@
+# FastAPI & ASGI
+fastapi
+uvicorn
+python-multipart
+
+# Database
+motor
+pymongo
+
+# HTTP & API
+requests
+httpx
+tenacity
+
+# Data Validation
+pydantic
+pydantic-settings
+
+# Utilities
+python-dotenv
+python-dateutil
+pytz
+
+# Security
+python-jose
+passlib
+bcrypt
+
+# Development
+pytest
+pytest-asyncio
+black
+flake8
