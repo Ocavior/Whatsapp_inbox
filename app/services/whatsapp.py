@@ -19,22 +19,22 @@ class WhatsAppService:
             "Content-Type": "application/json"
         }
         
-        # Simple in-memory rate limiting (for now)
+    
         self._last_request_time = 0
         self._request_count = 0
-        self._rate_limit_window = 1.0  # 1 second
+        self._rate_limit_window = 1.0 
         self._max_requests_per_window = 80
     
     async def _check_rate_limit(self) -> bool:
         """Simple rate limiter"""
         current_time = time.time()
         
-        # Reset counter if window has passed
+    
         if current_time - self._last_request_time > self._rate_limit_window:
             self._request_count = 0
             self._last_request_time = current_time
         
-        # Check if we're within limits
+        
         if self._request_count >= self._max_requests_per_window:
             wait_time = self._rate_limit_window - (current_time - self._last_request_time)
             if wait_time > 0:
@@ -58,7 +58,7 @@ class WhatsAppService:
     async def send_text_message(self, to: str, message: str) -> Dict:
         """Send text message with retry logic"""
         
-        # Wait for rate limit
+        
         await self._check_rate_limit()
         
         payload = {
@@ -155,7 +155,7 @@ class WhatsAppService:
                 timeout=30
             )
             
-            # Handle rate limiting
+            
             if response.status_code == 429:
                 retry_after = int(response.headers.get('Retry-After', 60))
                 logger.warning(f"Rate limited by API. Retrying after {retry_after} seconds")
@@ -209,11 +209,11 @@ class WhatsAppService:
     
     def normalize_phone_number(self, phone: str) -> str:
         """Normalize phone number for WhatsApp API"""
-        # Remove all non-digit characters
+        
         cleaned = ''.join(filter(str.isdigit, phone))
         
-        # Ensure it has country code
-        if len(cleaned) == 10:  # Assume India if no country code
+
+        if len(cleaned) == 10:  
             cleaned = '91' + cleaned
         
         return cleaned
@@ -225,7 +225,7 @@ class WhatsAppService:
         
         if not signature or not WHATSAPP_APP_SECRET:
             logger.warning("Missing signature or app secret for validation")
-            return True  # Skip validation if not configured
+            return True  
         
         try:
             expected_signature = hmac.new(

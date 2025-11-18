@@ -18,7 +18,7 @@ async def send_message(
 ):
     """Send a message to a user"""
     try:
-        # Send via WhatsApp API
+        
         if request.message_type == "text":
             result = await whatsapp_service.send_text_message(request.to, request.message)
         elif request.message_type == "template" and request.template_name:
@@ -28,7 +28,7 @@ async def send_message(
         else:
             raise HTTPException(status_code=400, detail="Unsupported message type")
         
-        # Save to database if successful
+    
         if result["success"]:
             message_data = {
                 "user_id": request.to,
@@ -67,7 +67,7 @@ async def get_conversation(
     try:
         messages = await inbox_service.get_user_messages(user_id, limit, skip)
         
-        # Convert to response format
+        
         message_list = []
         for msg in messages:
             message_list.append(MessageOut(

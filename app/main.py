@@ -13,15 +13,15 @@ from datetime import datetime
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle manager"""
-    # Startup
+    
     logger.info("🚀 WhatsApp Business API starting up...")
     
     try:
-        # Connect to MongoDB (async)
+        
         await db.connect_async()
         logger.info("✅ Database connected successfully")
         
-        # Initialize any other startup tasks here
+        
         
         yield
         
@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
         raise
     
     finally:
-        # Shutdown
+        
         logger.info("👋 WhatsApp Business API shutting down...")
         await db.close_async()
 
@@ -44,7 +44,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -54,7 +54,6 @@ app.add_middleware(
 )
 
 
-# Exception handlers
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation error: {exc}")
@@ -94,7 +93,7 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     try:
-        # Test database connection
+        
         if db.async_client:
             await db.async_client.admin.command('ping')
             return {

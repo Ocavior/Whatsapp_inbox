@@ -33,7 +33,7 @@ class MessageType(str, Enum):
 class Message(BaseModel):
     """Message model for MongoDB"""
     
-    # Pydantic v2 syntax
+    
     id: Optional[str] = Field(None, alias="_id")
     user_id: str = Field(..., description="WhatsApp phone number")
     direction: MessageDirection
@@ -53,7 +53,7 @@ class Message(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    # Pydantic v2 config
+    
     model_config = ConfigDict(
         use_enum_values=True,
         populate_by_name=True,
@@ -78,7 +78,7 @@ class Conversation(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    # Pydantic v2 config
+    
     model_config = ConfigDict(
         use_enum_values=True,
         populate_by_name=True,

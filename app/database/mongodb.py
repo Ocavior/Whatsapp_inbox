@@ -1,4 +1,3 @@
-# app/database/mongodb.py
 from pymongo import MongoClient
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -24,10 +23,10 @@ class MongoDB:
     def connect(self):
         """Establish synchronous database connection"""
         try:
-            # Synchronous client for immediate operations
+            
             self.sync_client = MongoClient(self.MONGODB_URI)
             
-            # Test the connection
+            
             self.sync_client.admin.command('ping')
             self.db = self.sync_client[self.DB_NAME]
             
@@ -41,10 +40,10 @@ class MongoDB:
     async def connect_async(self):
         """Establish async database connection for FastAPI"""
         try:
-            # Async client for FastAPI operations
+            
             self.async_client = AsyncIOMotorClient(self.MONGODB_URI)
             
-            # Test the connection
+            
             await self.async_client.admin.command('ping')
             self.async_db = self.async_client[self.DB_NAME]
             
@@ -78,5 +77,5 @@ class MongoDB:
         return self.async_db
 
 
-# Create a global instance
+
 db = MongoDB()

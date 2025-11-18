@@ -17,7 +17,7 @@ async def list_conversations(
     try:
         conversations = await inbox_service.get_conversations(limit, skip, archived)
         
-        # Convert to response format
+        
         conversation_list = []
         for conv in conversations:
             conversation_list.append(ConversationOut(

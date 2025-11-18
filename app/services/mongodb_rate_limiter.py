@@ -14,10 +14,10 @@ class MongoDBRateLimiter:
         try:
             window_start = datetime.utcnow().replace(microsecond=0)
             
-            # Clean old entries (optional, can be done with TTL index)
+            
             await self._clean_old_entries()
             
-            # Use findOneAndUpdate for atomic operation
+        
             result = await db.db.rate_limits.find_one_and_update(
                 {
                     "key": key,

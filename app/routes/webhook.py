@@ -36,7 +36,7 @@ async def receive_webhook(
 ):
     """Receive incoming messages and status updates from WhatsApp"""
     try:
-        # Verify signature
+        
         body_bytes = await request.body()
         signature = request.headers.get("x-hub-signature-256", "")
         
@@ -47,19 +47,19 @@ async def receive_webhook(
         body = await request.json()
         logger.info(f"Received webhook: {body}")
         
-        # Process webhook entry
+        
         entry = body.get("entry", [])
         for webhook_entry in entry:
             changes = webhook_entry.get("changes", [])
             for change in changes:
                 value = change.get("value", {})
                 
-                # Handle messages
+                
                 messages = value.get("messages", [])
                 for message in messages:
                     await _process_incoming_message(message, inbox_service)
                 
-                # Handle status updates
+                
                 statuses = value.get("statuses", [])
                 for status in statuses:
                     await _process_status_update(status, inbox_service)
@@ -87,7 +87,7 @@ async def _process_incoming_message(message: dict, inbox_service: InboxService):
             "message_id": message["id"]
         }
         
-        # Extract message content based on type
+        
         if message_type == "text":
             message_data["body"] = message.get("text", {}).get("body", "")
         elif message_type == "image":

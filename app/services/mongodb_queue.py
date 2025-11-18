@@ -34,8 +34,8 @@ class MongoDBQueue:
                 },
                 "$inc": {"attempts": 1}
             },
-            sort=[("created_at", 1)],  # FIFO - Fixed syntax
-            return_document=True  # Added missing parameter
+            sort=[("created_at", 1)],  
+            return_document=True 
         )
         return result
     

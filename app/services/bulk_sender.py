@@ -30,7 +30,7 @@ class BulkMessageSender:
         successful = []
         failed = []
         
-        # Create campaign record
+        
         await self._create_campaign(campaign_id, campaign_name, total)
         
         for index, contact in enumerate(contacts, 1):
@@ -44,15 +44,15 @@ class BulkMessageSender:
                     })
                     continue
                 
-                # Personalize message
+                
                 message = self._personalize_message(message_template, contact)
                 
-                # Send message
+                
                 result = await self.whatsapp_service.send_text_message(phone, message)
                 
                 database = self._get_db()
                 
-                # Save message to database
+                
                 if result['success']:
                     message_data = {
                         "user_id": phone,
@@ -71,7 +71,7 @@ class BulkMessageSender:
                     successful.append(contact)
                     
                 else:
-                    # Save failed message
+                    
                     message_data = {
                         "user_id": phone,
                         "direction": "outbound",
@@ -91,11 +91,11 @@ class BulkMessageSender:
                         "error": result.get('error', 'Unknown error')
                     })
                 
-                # Update progress
+                
                 if progress_callback:
                     progress_callback(index, total, len(successful), len(failed))
                 
-                # Delay between messages
+                
                 if index < total:
                     await asyncio.sleep(delay)
                     
@@ -106,7 +106,7 @@ class BulkMessageSender:
                     "error": str(e)
                 })
         
-        # Update campaign status
+        
         await self._update_campaign(campaign_id, len(successful), len(failed))
         
         return {
@@ -116,8 +116,8 @@ class BulkMessageSender:
             "successful": len(successful),
             "failed": len(failed),
             "success_rate": (len(successful) / total * 100) if total > 0 else 0,
-            "successful_contacts": successful[:10],  # First 10 for preview
-            "failed_contacts": failed[:10]  # First 10 for preview
+            "successful_contacts": successful[:10],  
+            "failed_contacts": failed[:10] 
         }
     
     async def load_contacts_from_csv(self, csv_file_path: str) -> List[Dict]:
@@ -127,7 +127,7 @@ class BulkMessageSender:
             with open(csv_file_path, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    # Strip whitespace from all values
+                    
                     contacts.append({k.strip(): v.strip() for k, v in row.items()})
             
             logger.info(f"Loaded {len(contacts)} contacts from {csv_file_path}")
@@ -153,7 +153,7 @@ class BulkMessageSender:
                 })
                 continue
             
-            # Basic phone validation
+            
             cleaned_phone = ''.join(filter(str.isdigit, phone))
             if len(cleaned_phone) < 10:
                 invalid_contacts.append({
@@ -175,7 +175,7 @@ class BulkMessageSender:
     def _personalize_message(self, template: str, contact: Dict) -> str:
         """Personalize message with contact data"""
         try:
-            # Use safe string formatting
+            
             return template.format(**contact)
         except KeyError as e:
             logger.warning(f"Missing placeholder {e} in template, using original template")

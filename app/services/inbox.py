@@ -25,7 +25,7 @@ class InboxService:
             database = self._get_db()
             message = Message(**message_data)
             
-            # Convert to dict and handle ObjectId
+            
             message_dict = message.model_dump(by_alias=True, exclude_none=True)
             if '_id' in message_dict and message_dict['_id'] is None:
                 del message_dict['_id']
@@ -33,7 +33,7 @@ class InboxService:
             result = await database.messages.insert_one(message_dict)
             message_id = str(result.inserted_id)
             
-            # Update conversation
+            
             await self._update_conversation(message)
             
             logger.info(f"Message saved for user {message.user_id}")
@@ -62,7 +62,7 @@ class InboxService:
             )
             
             if result.modified_count > 0:
-                # Get the message to update conversation
+                
                 message_doc = await database.messages.find_one({"message_id": message_id})
                 if message_doc:
                     message = Message(**message_doc)
@@ -185,7 +185,7 @@ class InboxService:
                 }
             }
             
-            # Increment counters
+            
             if message.direction == MessageDirection.INBOUND:
                 update_ops["$inc"] = {
                     "unread_count": 1,

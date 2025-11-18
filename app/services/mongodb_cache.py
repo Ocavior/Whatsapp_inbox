@@ -1,12 +1,12 @@
 # app/services/mongodb_cache.py
 import time
-from app.database.mongodb import *  # Import the MongoDB instance
+from app.database.mongodb import *  
 
 class MongoDBCache:
     def __init__(self):
         try:
-            # Get database from the MongoDB instance - DON'T CALL IT AS FUNCTION
-            database = db.connect()  # This is a method call, not a function call
+            
+            database = db.connect()  
             
             if database is None:
                 raise Exception("Database connection failed - database is None")

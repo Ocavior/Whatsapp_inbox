@@ -21,27 +21,27 @@ async def send_bulk_messages(
 ):
     """Send bulk messages from CSV file"""
     try:
-        # Validate file type
+    
         if not contacts_file.filename or not contacts_file.filename.endswith('.csv'):
             raise HTTPException(status_code=400, detail="Only CSV files are supported")
         
-        # Save uploaded file temporarily
+        
         with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as temp_file:
             content = await contacts_file.read()
             temp_file.write(content)
             temp_path = temp_file.name
         
         try:
-            # Load contacts
+            
             contacts = await bulk_sender.load_contacts_from_csv(temp_path)
             
-            # Validate contacts
+            
             validation_result = bulk_sender.validate_contacts(contacts)
             
             if validation_result["total_valid"] == 0:
                 raise HTTPException(status_code=400, detail="No valid contacts found")
             
-            # Send messages
+            
             result = await bulk_sender.send_bulk_messages(
                 contacts=validation_result["valid"],
                 message_template=message_template,
@@ -54,7 +54,7 @@ async def send_bulk_messages(
             return result
             
         finally:
-            # Clean up temporary file
+            
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
             

@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 import json
 import os
-from app.config import DEBUG, LOG_LEVEL  # Import from new config
+from app.config import DEBUG, LOG_LEVEL  
 
 
 class JSONFormatter(logging.Formatter):
@@ -31,15 +31,15 @@ def setup_logger(name: str = "whatsapp_business") -> logging.Logger:
     
     logger = logging.getLogger(name)
     
-    # Avoid duplicate handlers
+    
     if logger.handlers:
         return logger
     
-    # Use LOG_LEVEL from config (with fallback)
+
     log_level = getattr(logging, LOG_LEVEL.upper(), logging.INFO)
     logger.setLevel(log_level)
     
-    # Console handler with JSON format
+    
     console_handler = logging.StreamHandler(sys.stdout)
     if DEBUG:
         console_handler.setFormatter(logging.Formatter(
@@ -48,7 +48,7 @@ def setup_logger(name: str = "whatsapp_business") -> logging.Logger:
     else:
         console_handler.setFormatter(JSONFormatter())
     
-    # File handler
+    
     log_dir = "storage/logs"
     os.makedirs(log_dir, exist_ok=True)
     
@@ -64,5 +64,4 @@ def setup_logger(name: str = "whatsapp_business") -> logging.Logger:
     return logger
 
 
-# Create default logger instance
 logger = setup_logger()
