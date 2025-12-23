@@ -38,14 +38,7 @@ async def verify_webhook(request: Request):
     return PlainTextResponse(content="Verification failed", status_code=403)
 
 
-@router.get("/test-token")
-async def test_token():
-    """Test if token is loaded correctly"""
-    return {
-        "token_is_set": WEBHOOK_VERIFY_TOKEN is not None,
-        "token_length": len(WEBHOOK_VERIFY_TOKEN) if WEBHOOK_VERIFY_TOKEN else 0,
-        "token_first_3_chars": WEBHOOK_VERIFY_TOKEN[:3] if WEBHOOK_VERIFY_TOKEN else "NONE"
-    }
+
 
 @router.post("/webhook")
 async def receive_webhook(
