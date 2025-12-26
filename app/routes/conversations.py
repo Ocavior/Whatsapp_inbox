@@ -8,7 +8,7 @@ from app.database.mongodb import db
 router = APIRouter(prefix="/api/conversations", tags=["conversations"])
 inbox_service = InboxService()
 
-@router.get("/debug")
+@router.get("/list_conversations")
 async def debug_conversations():
     try:
         database = db.async_db
