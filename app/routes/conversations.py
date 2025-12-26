@@ -188,21 +188,6 @@ async def get_conversation_history(
         logger.error(f"Error fetching history: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/{user_id}/read")
-async def mark_conversation_read(user_id: str):
-    try:
-        success = await inbox_service.mark_conversation_read(user_id)
-        if success:
-            return {
-                "success": True,
-                "user_id": user_id,
-                "message": "Conversation marked as read"
-            }
-        else:
-            raise HTTPException(status_code=404, detail="Conversation not found")
-    except Exception as e:
-        logger.error(f"Error marking conversation as read: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/search")
 async def search_messages(
