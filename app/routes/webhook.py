@@ -13,24 +13,24 @@ router = APIRouter()
 async def verify_webhook(request: Request):
     """Verify webhook for WhatsApp Business API - NO DEPENDENCIES"""
     
-    # Get query parameters
+    
     mode = request.query_params.get("hub.mode")
     token = request.query_params.get("hub.verify_token")
     challenge = request.query_params.get("hub.challenge")
     
-    # Log the verification attempt
+    
     logger.info(f"🔍 Webhook verification attempt:")
     logger.info(f"  - Mode: {mode}")
     logger.info(f"  - Token received: {token}")
     logger.info(f"  - Challenge: {challenge}")
     logger.info(f"  - Expected token: {WEBHOOK_VERIFY_TOKEN}")
      
-    # Verify the token
+
     if mode == "subscribe" and token == WEBHOOK_VERIFY_TOKEN:
         logger.info("✅ Webhook verified successfully!")
         return PlainTextResponse(content=challenge, status_code=200)
     
-    # Log failure details
+    
     logger.warning(f"❌ Webhook verification failed!")
     logger.warning(f"  - Mode match: {mode == 'subscribe'}")
     logger.warning(f"  - Token match: {token == WEBHOOK_VERIFY_TOKEN}")
@@ -48,34 +48,34 @@ async def receive_webhook(
 ):
     """Receive incoming messages and status updates from WhatsApp"""
     try:
-        # Get raw body for signature verification
+        
         body_bytes = await request.body()
         signature = request.headers.get("x-hub-signature-256", "")
         
-        # Validate signature (optional in development, required in production)
+        
         if signature:
             if not whatsapp_service.validate_webhook_signature(body_bytes, signature):
                 logger.warning("⚠️ Invalid webhook signature")
                 # Uncomment in production:
-                # raise HTTPException(status_code=401, detail="Invalid signature")
+                raise HTTPException(status_code=401, detail="Invalid signature")
         
-        # Parse JSON body
+
         body = await request.json()
         logger.info(f"📨 Received webhook: {body}")
         
-        # Process webhook entry
+        
         entry = body.get("entry", [])
         for webhook_entry in entry:
             changes = webhook_entry.get("changes", [])
             for change in changes:
                 value = change.get("value", {})
                 
-                # Handle incoming messages
+                
                 messages = value.get("messages", [])
                 for message in messages:
                     await _process_incoming_message(message, inbox_service, whatsapp_service)
                 
-                # Handle status updates
+                
                 statuses = value.get("statuses", [])
                 for status in statuses:
                     await _process_status_update(status, inbox_service)
@@ -105,7 +105,7 @@ async def _process_incoming_message(message: dict, inbox_service: InboxService,
             "message_id": message["id"]
         }
         
-        # Extract message content based on type
+        
         if message_type == "text":
             message_data["body"] = message.get("text", {}).get("body", "")
         elif message_type == "image":
@@ -141,11 +141,11 @@ async def _process_incoming_message(message: dict, inbox_service: InboxService,
         else:
             message_data["body"] = f"[{message_type.capitalize()}]"
         
-        # Save message to database
+        
         await inbox_service.save_message(message_data)
         logger.info(f"✅ Processed incoming message from {from_number}: {message_type}")
         
-        # 🔔 SEND REAL-TIME WEBSOCKET NOTIFICATION
+        
         try:
             await manager.broadcast({
                 "type": "new_message",
@@ -161,9 +161,9 @@ async def _process_incoming_message(message: dict, inbox_service: InboxService,
             logger.info(f"📢 WebSocket notification sent for message from {from_number}")
         except Exception as notif_error:
             logger.error(f"⚠️ Failed to send WebSocket notification: {notif_error}")
-            # Don't fail the whole webhook if notification fails
+            
         
-        # Mark message as read (optional)
+        
         try:
             await whatsapp_service.mark_message_as_read(message["id"])
         except Exception as e:
@@ -180,7 +180,7 @@ async def _process_status_update(status: dict, inbox_service: InboxService):
         new_status = status.get("status")
         recipient = status.get("recipient_id")
         
-        # Get error information if status is failed
+        
         error_info = None
         if new_status == "failed":
             errors = status.get("errors", [])

@@ -1,0 +1,5 @@
+{"timestamp": "2025-12-26T15:01:13.348644", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\ude80 WhatsApp Business API starting up...", "module": "main", "function": "lifespan", "line": 17}
+{"timestamp": "2025-12-26T15:01:16.165788", "level": "INFO", "logger": "whatsapp_business", "message": "\u2705 Database connected successfully", "module": "main", "function": "lifespan", "line": 22}
+{"timestamp": "2025-12-26T15:01:49.912844", "level": "INFO", "logger": "whatsapp_business", "message": "Synced 14 conversations", "module": "conversations", "function": "sync_conversations", "line": 97}
+{"timestamp": "2025-12-26T15:02:35.537992", "level": "INFO", "logger": "whatsapp_business", "message": "Synced 14 conversations", "module": "conversations", "function": "sync_conversations", "line": 97}
+{"timestamp": "2025-12-26T15:04:00.893127", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\udc4b WhatsApp Business API shutting down...", "module": "main", "function": "lifespan", "line": 32}

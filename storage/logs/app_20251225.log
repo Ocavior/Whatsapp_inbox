@@ -1,0 +1,3 @@
+{"timestamp": "2025-12-25T18:07:39.219878", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\ude80 WhatsApp Business API starting up...", "module": "main", "function": "lifespan", "line": 17}
+{"timestamp": "2025-12-25T18:07:40.353698", "level": "INFO", "logger": "whatsapp_business", "message": "\u2705 Database connected successfully", "module": "main", "function": "lifespan", "line": 22}
+{"timestamp": "2025-12-25T18:10:10.031841", "level": "ERROR", "logger": "whatsapp_business", "message": "Error marking conversation as read: 404: Conversation not found", "module": "conversations", "function": "mark_conversation_read", "line": 171}
