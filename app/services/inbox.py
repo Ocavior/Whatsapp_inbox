@@ -71,6 +71,39 @@ class InboxService:
             logger.error(f"Error updating message status: {e}", exc_info=True)
             return False
     
+    async def update_user_name(self, user_id: str, user_name: str) -> bool:
+        """
+        Update username for a conversation and all associated messages
+        """
+        try:
+            database = self._get_db()
+            
+            # Update conversation
+            conv_result = await database.conversations.update_one(
+                {"user_id": user_id},
+                {"$set": {
+                    "user_name": user_name,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            # Update all messages for this user
+            msg_result = await database.messages.update_many(
+                {"user_id": user_id},
+                {"$set": {
+                    "user_name": user_name,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            logger.info(f"Updated username for {user_id}: {msg_result.modified_count} messages updated")
+            
+            return conv_result.modified_count > 0
+            
+        except Exception as e:
+            logger.error(f"Error updating username: {e}", exc_info=True)
+            return False
+    
     async def get_user_messages(self, user_id: str, limit: int = 100, 
                               skip: int = 0) -> List[Dict]:
         """Get messages for a specific user (BOTH inbound and outbound)"""
@@ -97,12 +130,6 @@ class InboxService:
                                           skip: int = 0, days: Optional[int] = None) -> List[Dict]:
         """
         Get messages with optional date filter
-        
-        Args:
-            user_id: Customer phone number
-            limit: Number of messages
-            skip: Pagination offset
-            days: Get messages from last N days (e.g., 10, 15, 20)
         """
         try:
             database = self._get_db()
@@ -140,12 +167,6 @@ class InboxService:
                                         limit: int = 500) -> List[Dict]:
         """
         Get messages between specific dates
-        
-        Args:
-            user_id: Customer phone number
-            start_date: Start date (inclusive)
-            end_date: End date (inclusive)
-            limit: Max messages
         """
         try:
             database = self._get_db()
@@ -359,6 +380,10 @@ class InboxService:
                     "total_messages": 0
                 }
             }
+            
+            # Add username if provided
+            if hasattr(message, 'user_name') and message.user_name:
+                update_ops["$set"]["user_name"] = message.user_name
             
             # Increment counters
             if message.direction == MessageDirection.INBOUND:

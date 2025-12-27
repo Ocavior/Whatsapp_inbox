@@ -18,7 +18,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     
     try:
-        # Send welcome message
+        # Send 
         await websocket.send_json({
             "type": "connected",
             "message": "Successfully connected to notification service",

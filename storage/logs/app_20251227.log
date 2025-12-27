@@ -1,0 +1,11 @@
+{"timestamp": "2025-12-27T03:54:03.897706", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\ude80 WhatsApp Business API starting up...", "module": "main", "function": "lifespan", "line": 17}
+{"timestamp": "2025-12-27T03:54:05.339157", "level": "INFO", "logger": "whatsapp_business", "message": "\u2705 Database connected successfully", "module": "main", "function": "lifespan", "line": 22}
+{"timestamp": "2025-12-27T03:55:07.005821", "level": "INFO", "logger": "whatsapp_business", "message": "User search 'saurabh': Found 0 results", "module": "conversations", "function": "search_users", "line": 200}
+{"timestamp": "2025-12-27T03:55:18.723785", "level": "INFO", "logger": "whatsapp_business", "message": "User search '919137': Found 1 results", "module": "conversations", "function": "search_users", "line": 200}
+{"timestamp": "2025-12-27T03:56:05.138316", "level": "INFO", "logger": "whatsapp_business", "message": "Fetched 14 conversations (total: 14)", "module": "conversations", "function": "get_conversations", "line": 121}
+{"timestamp": "2025-12-27T03:57:44.016743", "level": "INFO", "logger": "whatsapp_business", "message": "Message sent successfully, ID: wamid.HBgMOTE5MTM3MzQ3MTI4FQIAERgSOEFCRjlGNDNFODhGRkNBMDMzAA==", "module": "whatsapp", "function": "_make_request", "line": 169}
+{"timestamp": "2025-12-27T03:57:44.205118", "level": "INFO", "logger": "whatsapp_business", "message": "Message saved for user 919137347128", "module": "inbox", "function": "save_message", "line": 39}
+{"timestamp": "2025-12-27T04:02:15.554354", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\udc4b WhatsApp Business API shutting down...", "module": "main", "function": "lifespan", "line": 32}
+{"timestamp": "2025-12-27T04:02:19.534925", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\ude80 WhatsApp Business API starting up...", "module": "main", "function": "lifespan", "line": 17}
+{"timestamp": "2025-12-27T04:02:20.593813", "level": "INFO", "logger": "whatsapp_business", "message": "\u2705 Database connected successfully", "module": "main", "function": "lifespan", "line": 22}
+{"timestamp": "2025-12-27T04:02:52.034763", "level": "INFO", "logger": "whatsapp_business", "message": "\ud83d\udc4b WhatsApp Business API shutting down...", "module": "main", "function": "lifespan", "line": 32}

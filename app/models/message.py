@@ -33,9 +33,10 @@ class MessageType(str, Enum):
 class Message(BaseModel):
     """Message model for MongoDB"""
     
-    
+    # Fields
     id: Optional[str] = Field(None, alias="_id")
     user_id: str = Field(..., description="WhatsApp phone number")
+    user_name: Optional[str] = Field(None, description="User/Contact name")  # ✅ NEW FIELD
     direction: MessageDirection
     message_type: MessageType = MessageType.TEXT
     body: str
@@ -53,7 +54,7 @@ class Message(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    
+    # Configuration
     model_config = ConfigDict(
         use_enum_values=True,
         populate_by_name=True,
@@ -67,7 +68,7 @@ class Conversation(BaseModel):
     
     id: Optional[str] = Field(None, alias="_id")
     user_id: str = Field(..., description="WhatsApp phone number")
-    user_name: Optional[str] = None
+    user_name: Optional[str] = Field(None, description="User/Contact name")  # ✅ NEW FIELD
     last_message: str
     last_message_timestamp: datetime
     last_message_direction: MessageDirection
@@ -78,7 +79,7 @@ class Conversation(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    
+    # Configuration
     model_config = ConfigDict(
         use_enum_values=True,
         populate_by_name=True,
